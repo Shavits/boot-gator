@@ -8,13 +8,12 @@ import (
 
 const configFileName = ".gatorconfig.json"
 
-
-type Config struct{
-    DbURL           string `json:"db_url"`
-    CurrentUserName string `json:"current_user_name"`
+type Config struct {
+	DbURL           string `json:"db_url"`
+	CurrentUserName string `json:"current_user_name"`
 }
 
-func Read() (Config, error){
+func Read() (Config, error) {
 	configFilePath, err := getConfigFilePath()
 	if err != nil {
 		return Config{}, err
@@ -27,21 +26,23 @@ func Read() (Config, error){
 
 	dec := json.NewDecoder(configFile)
 	var config Config
-	if err := dec.Decode(&config); err != nil{
+	if err := dec.Decode(&config); err != nil {
 		return Config{}, err
 	}
 	return config, nil
 
 }
 
-func SetUser(userName string) error{
-	
+func SetUser(userName string) error {
+	config, err := Read()
+	if err != nil {
+		return err
+	}
+	config.CurrentUserName = userName
+	return write(config)
 }
 
-
-
-
-func getConfigFilePath() (string, error){
+func getConfigFilePath() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("Failed to get config file path: %s", err)
@@ -51,5 +52,21 @@ func getConfigFilePath() (string, error){
 
 }
 
-func write(cfg Config) error
+func write(cfg Config) error {
+	configFilePath, err := getConfigFilePath()
+	if err != nil {
+		return err
+	}
 
+	data, err := json.Marshal(cfg)
+	if err != nil {
+		return fmt.Errorf("Error marshaling json: %s", err)
+	}
+
+	if err := os.WriteFile(configFilePath, data, 0600); err != nil {
+		return fmt.Errorf("Failed to write file: %s", err)
+	}
+
+	return nil
+
+}
