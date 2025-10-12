@@ -45,7 +45,7 @@ func SetUser(userName string) error {
 func getConfigFilePath() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return "", fmt.Errorf("Failed to get config file path: %s", err)
+		return "", fmt.Errorf("failed to get config file path: %s", err)
 	}
 
 	return fmt.Sprintf("%s/%s", homeDir, configFileName), nil
@@ -60,11 +60,11 @@ func write(cfg Config) error {
 
 	data, err := json.Marshal(cfg)
 	if err != nil {
-		return fmt.Errorf("Error marshaling json: %s", err)
+		return fmt.Errorf("error marshaling json: %s", err)
 	}
 
 	if err := os.WriteFile(configFilePath, data, 0600); err != nil {
-		return fmt.Errorf("Failed to write file: %s", err)
+		return fmt.Errorf("failed to write file: %s", err)
 	}
 
 	return nil
