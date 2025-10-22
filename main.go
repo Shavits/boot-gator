@@ -1,13 +1,17 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/shavits/boot-gator/internal/config"
+	"github.com/shavits/boot-gator/internal/database"
 )
 
 type state struct{
+	db *database.Queries
 	config *config.Config
 }
 
@@ -16,17 +20,27 @@ func main() {
 	if err != nil {
 		fmt.Print(err)
 	}
+
+	db, err := sql.Open("postgres", curConfig.DbURL)
+	if err != nil {
+		fmt.Printf("error opening db - %s", err)
+	}
+	dbQueries := database.New(db)
+
 	curState := state{
+		db: dbQueries,
 		config: &curConfig,
 	}
-	cmds := Commands{handlers: make(map[string]func(*state, Command) error)}
+
+	cmds := commands{handlers: make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
 	args := os.Args
 	if len(args) < 2{
 		fmt.Println("No arguments provided")
 		os.Exit(1)
 	}
-	cmd := Command{
+	cmd := command{
 		name: args[1],
 		args: args[2:],
 	}
@@ -39,18 +53,6 @@ func main() {
 	
 }
 
-func handlerLogin(s *state, cmd Command) error{
-	if len(cmd.args) == 0{
-		return fmt.Errorf("args empty, valid username expected")
-	}
-	user := cmd.args[0]
-	err := s.config.SetUser(user)
-	if err != nil{
-		return fmt.Errorf("unable to set user - %s", err)
-	}
-	
-	fmt.Printf("User set as - %s\n", user)
-	return nil
-}
+
 
 

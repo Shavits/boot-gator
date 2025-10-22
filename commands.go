@@ -2,16 +2,16 @@ package main
 
 import "fmt"
 
-type Command struct{
+type command struct{
 	name string
 	args []string
 }
 
-type Commands struct{
-	handlers map[string]func(*state, Command) error
+type commands struct{
+	handlers map[string]func(*state, command) error
 }
 
-func (c *Commands) run(s *state, cmd Command) error{
+func (c *commands) run(s *state, cmd command) error{
 	handler, ok := c.handlers[cmd.name]; if !ok {
 		return fmt.Errorf("command %s does not exist", cmd.name)
 	}
@@ -19,6 +19,6 @@ func (c *Commands) run(s *state, cmd Command) error{
 	return err
 }
 
-func (c *Commands) register(name string, f func(*state, Command) error){
+func (c *commands) register(name string, f func(*state, command) error){
 	c.handlers[name] = f
 }
