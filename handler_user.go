@@ -57,7 +57,24 @@ func handlerRegister(s *state, cmd command) error{
 	if err != nil{
 		return err
 	}
-	fmt.Printf("Create user - %s\n", userName)
+	fmt.Printf("Created user - %s\n", userName)
+	printUser(user)
 	return nil
 
+}
+
+
+func handlerReset(s *state, cmd command) error{
+	err := s.db.ResetUsers(context.Background())
+	if err != nil{
+		return fmt.Errorf("unable to reset users - %s", err)
+	}
+
+	return nil
+}
+
+
+func printUser(user database.User) {
+	fmt.Printf(" * ID:      %v\n", user.ID)
+	fmt.Printf(" * Name:    %v\n", user.Name)
 }
