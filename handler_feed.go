@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -19,8 +18,8 @@ func handlerAddFeed(s *state, cmd command) error{
 	name := cmd.args[0]
 	url := cmd.args[1]
 	user, err := s.db.GetUser(context.Background(), s.config.CurrentUserName)
-	if err == sql.ErrNoRows{
-		return fmt.Errorf("user %s does not exist", s.config.CurrentUserName)
+	if err != nil{
+		return fmt.Errorf("error getting user - %s", s.config.CurrentUserName)
 	}
 
 	params := database.CreateFeedParams{
@@ -36,6 +35,26 @@ func handlerAddFeed(s *state, cmd command) error{
 		return fmt.Errorf("failed to create feed - %s", err)
 	}
 	printFeed(feed)
+	return nil
+}
+
+func handlerFeeds(s *state, cmd command) error{
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil{
+		return fmt.Errorf("failed to get feeds - %s", err)
+	}
+
+
+
+	for _, feed := range(feeds){
+		user, err := s.db.GetUserByID(context.Background(), feed.UserID)
+		if err != nil{
+		return fmt.Errorf("error getting user - %s", s.config.CurrentUserName)
+		}
+		fmt.Printf("name - %s\n", feed.Name)
+		fmt.Printf("url - %s\n", feed.Name)
+		fmt.Printf("user - %s\n", user.Name)
+	}
 	return nil
 }
 
