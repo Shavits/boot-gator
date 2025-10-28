@@ -12,7 +12,7 @@ import (
 
 
 func handlerAddFeed(s *state, cmd command) error{
-		if len(cmd.args) < 2{
+	if len(cmd.args) < 2{
 		return fmt.Errorf("args empty, valid name and url expected")
 	}
 	name := cmd.args[0]
@@ -35,6 +35,21 @@ func handlerAddFeed(s *state, cmd command) error{
 		return fmt.Errorf("failed to create feed - %s", err)
 	}
 	printFeed(feed)
+
+
+	
+	followParams := database.CreateFeedFollowParams{
+		ID: uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID: user.ID,
+		FeedID: feed.ID,
+	}
+
+	_, err = s.db.CreateFeedFollow(context.Background(), followParams)
+	if err != nil{
+		return fmt.Errorf("failed to create feed_follow - %v", err)
+	}
 	return nil
 }
 
