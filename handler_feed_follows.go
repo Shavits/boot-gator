@@ -10,16 +10,13 @@ import (
 )
 
 
-func handlerFollow(s *state, cmd command) error{
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.args) == 0{
 		return fmt.Errorf("args empty, valid url expected")
 	}
 	url := cmd.args[0]
 
-	user, err := s.db.GetUser(context.Background(), s.config.CurrentUserName)
-	if err != nil{
-		return fmt.Errorf("error getting user - %s", s.config.CurrentUserName)
-	}
+
 
 	feed, err := s.db.GetFeedByUrl(context.Background(), url)
 	if err != nil{
@@ -46,11 +43,7 @@ func handlerFollow(s *state, cmd command) error{
 }
 
 
-func handlerFollowing(s *state, cmd command) error{
-	user, err := s.db.GetUser(context.Background(), s.config.CurrentUserName)
-	if err != nil{
-		return fmt.Errorf("error getting user - %s", s.config.CurrentUserName)
-	}
+func handlerFollowing(s *state, cmd command, user database.User) error{
 	follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil{
 		return fmt.Errorf("error getting feeds - %v", err)

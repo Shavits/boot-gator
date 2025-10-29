@@ -11,16 +11,12 @@ import (
 
 
 
-func handlerAddFeed(s *state, cmd command) error{
+func handlerAddFeed(s *state, cmd command, user database.User) error{
 	if len(cmd.args) < 2{
 		return fmt.Errorf("args empty, valid name and url expected")
 	}
 	name := cmd.args[0]
 	url := cmd.args[1]
-	user, err := s.db.GetUser(context.Background(), s.config.CurrentUserName)
-	if err != nil{
-		return fmt.Errorf("error getting user - %s", s.config.CurrentUserName)
-	}
 
 	params := database.CreateFeedParams{
 		ID: uuid.New(),
