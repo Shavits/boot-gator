@@ -43,6 +43,30 @@ func handlerFollow(s *state, cmd command, user database.User) error {
 }
 
 
+
+func handlerUnfollow(s *state, cmd command, user database.User) error {
+	if len(cmd.args) == 0{
+		return fmt.Errorf("args empty, valid url expected")
+	}
+	url := cmd.args[0]
+
+	feed, err := s.db.GetFeedByUrl(context.Background(), url)
+	if err != nil{
+		return fmt.Errorf("error getting feed for url - %s", url)
+	}
+
+	params := database.RemoveFeedFollowParams{
+		UserID: user.ID,
+		FeedID: feed.ID,
+	}
+	err = s.db.RemoveFeedFollow(context.Background(), params)
+	if err != nil{
+		return fmt.Errorf("failed to remove follow - %v", err)
+	}
+	return nil
+}
+
+
 func handlerFollowing(s *state, cmd command, user database.User) error{
 	follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil{
