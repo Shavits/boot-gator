@@ -25,7 +25,7 @@ func handlerBrowse(s *state, cmd command, user database.User) error{
 
 	posts, err := s.db.GetPostsForUser(context.Background(), user.ID)
 	if err != nil{
-		return fmt.Errorf("Failed to get posts for user %v - %v", user.ID, err)
+		return fmt.Errorf("failed to get posts for user %v - %v", user.ID, err)
 	}
 
 	for i := range(limit){
